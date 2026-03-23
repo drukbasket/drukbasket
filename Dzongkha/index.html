@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Druk Basket</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/drukbasket/style.css">
 </head>
 <body>
 
     <header class="navbar">
         <div class="logo-container">
-            <img src="/Images/logo.png" alt="Drukbasket Logo" class="main-logo">
+            <img src="/drukbasket/Images/logo.png" alt="Drukbasket Logo" class="main-logo">
         </div>
         <nav>
             <a href="index.html">ཚོང་འགྲན།</a>
@@ -20,13 +20,13 @@
         </nav>
         <div class="user-actions">
             <span class="market-price">ཁྲོམ་གྱི་གོང་ཚད་ལྟ་ནི།</span>
-            <a href="/index.html" style="text-decoration: none;">DZO</a>
-            <div class="cart-container" style="position: relative; display: inline-block; cursor: pointer;" onclick="window.location.href='/Addtocart/addToCart.html'">
+            <a href="/drukbasket/index.html" style="text-decoration: none;">DZO</a>
+            <div class="cart-container" style="position: relative; display: inline-block; cursor: pointer;" onclick="window.location.href='/drukbasket/Addtocart/addToCart.html'">
                 <span class="cart" style="font-size: 1.5rem;">🛒</span>
                 <span id="cart-count" class="cart-badge">0</span>
             </div>
             <span class="notification">🔔</span>
-            <a href="/login.html" class="login-btn-link">
+            <a href="/drukbasket/login.html" class="login-btn-link">
                 <button class="login-btn">ནང་འཛུལ་འབད་།</button>
             </a>
         </div>
@@ -148,7 +148,7 @@
                         <div class="card-content no-top">
                             <div class="btn-group">
                                 <button class="add-cart" onclick="addToCart('${p.name}', '${p.price}', '${p.unit}', '${p.img}')">ADD TO CART</button>
-                                <button class="preorder" onclick="window.location.href='/Preorder/preorder.html'">PREORDER</button>
+                                <button class="preorder" onclick="window.location.href='/drukbasket/Preorder/preorder.html'">PREORDER</button>
                             </div>
                         </div> 
                     </div>
