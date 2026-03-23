@@ -178,7 +178,7 @@
 
 <div class="phone-container">
     <header class="app-header">
-        <a href="/Phone/index.html"><img src="/Images/logo.png" alt="Logo" style="height: 25px;"></a>
+        <a href="/drukbasket/Phone/index.html"><img src="/drukbasket/Images/logo.png" alt="Logo" style="height: 25px;"></a>
         <span style="font-weight: 900; color: #ff5e5e;">LIVE 🔴</span>
     </header>
 
@@ -276,7 +276,7 @@
         // Save selected total and proceed
         const total = selected.reduce((sum, i) => sum + (parseFloat(i.price) * i.qty), 0);
         localStorage.setItem('tempTotalPayable', total + 75); // Nu. 75 Delivery
-        window.location.href = '/Phone/checkout.html';
+        window.location.href = '/drukbasket/Phone/checkout.html';
     }
 
     displayCart();
