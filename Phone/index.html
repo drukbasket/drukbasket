@@ -194,8 +194,8 @@
 
 <div class="phone-container">
   <header class="app-header">
-    <img src="/Images/logo.png" alt="Druk Basket" class="main-logo">
-    <div class="cart-container" style="position: relative; display: inline-block; cursor: pointer;" onclick="window.location.href='/Phone/addToCart.html'">
+    <img src="/drukbasket/Images/logo.png" alt="Druk Basket" class="main-logo">
+    <div class="cart-container" style="position: relative; display: inline-block; cursor: pointer;" onclick="window.location.href='/drukbasket/Phone/addToCart.html'">
         <span class="cart" style="font-size: 1.5rem;">🛒</span>
         <span id="cart-count" class="cart-badge">0</span>
     </div>
@@ -219,18 +219,18 @@
 
   <nav class="bottom-nav">
     <!---<a href="/Phone/home.html" class="nav-link"><i>🏠</i><span>HOME</span></a>--->
-    <a href="/Phone/index.html" class="nav-link active"><i>🥬</i><span>MARKET</span></a>
-    <a href="/Phone/market-prices.html" class="nav-link"><i>📈</i><span>PRICES</span></a>
-    <a href="/Phone/login.html" class="nav-link"><i>👤</i><span>MY ACCOUNT</span></a>
+    <a href="/drukbasket/Phone/index.html" class="nav-link active"><i>🥬</i><span>MARKET</span></a>
+    <a href="/drukbasket/Phone/market-prices.html" class="nav-link"><i>📈</i><span>PRICES</span></a>
+    <a href="/drukbasket/Phone/login.html" class="nav-link"><i>👤</i><span>MY ACCOUNT</span></a>
   </nav>
 </div>
 
 <script>
   const products = [
-    { name: "Red Onion", price: "60", unit: "Kg", badge: "GAP", img: "Images/red-onion.jpg" },
-    { name: "Local Potato", price: "45", unit: "Kg", badge: "GI Tag", img: "Images/local-potato.jpg" },
-    { name: "Pure Honey", price: "850", unit: "500ml", badge: "GI Tag", img: "Images/honey.jpg" },
-    { name: "Green Chilli", price: "120", unit: "Kg", badge: "Organic", img: "Images/green-chilli.jpg" }
+    { name: "Red Onion", price: "60", unit: "Kg", badge: "GAP", img: "/drukbasket/Images/red-onion.jpg" },
+    { name: "Local Potato", price: "45", unit: "Kg", badge: "GI Tag", img: "/drukbasket/Images/local-potato.jpg" },
+    { name: "Pure Honey", price: "850", unit: "500ml", badge: "GI Tag", img: "/drukbasket/Images/honey.jpg" },
+    { name: "Green Chilli", price: "120", unit: "Kg", badge: "Organic", img: "/drukbasket/Images/green-chilli.jpg" }
   ];
 
   function render(data) {
