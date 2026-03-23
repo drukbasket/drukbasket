@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout | DrukBasket</title>
-    <script src="/auth.js"></script>
-    <link rel="stylesheet" href="/style.css">
+    <script src="/drukbasket/auth.js"></script>
+    <link rel="stylesheet" href="/drukbasket/style.css">
     <style>
         /* UI Enhancements */
         .live-logo-container { display: inline-flex; align-items: center; gap: 4px; }
@@ -40,26 +40,26 @@
 <body>
     <header class="navbar">
         <div class="logo-container">
-            <a href="/index.html"><img src="/Images/logo.png" alt="Drukbasket Logo" class="main-logo"></a>
+            <a href="/drukbasket/index.html"><img src="/drukbasket/Images/logo.png" alt="Drukbasket Logo" class="main-logo"></a>
         </div>
         <nav>
-            <a href="/index.html">Marketplace</a>
-            <a href="/aboutUs.html">About Us</a>
-            <a href="/contactUs.html">Contact Us</a>
+            <a href="/drukbasket/index.html">Marketplace</a>
+            <a href="/drukbasket/aboutUs.html">About Us</a>
+            <a href="/drukbasket/contactUs.html">Contact Us</a>
         </nav>
         <div class="user-actions">
-            <a href="/market-prices.html" style="text-decoration: none;">
+            <a href="/drukbasket/market-prices.html" style="text-decoration: none;">
                 <div class="live-logo-container">
                     <span class="market-price">View Current Market Prices</span>
                     <div class="recording-circle"><div class="inner-dot"></div><div class="outer-ring"></div></div>
                 </div>
             </a>
-            <a href="Dzongkha/index.html" style="text-decoration: none;">EN</a>
+            <a href="/drukbasket/Dzongkha/index.html" style="text-decoration: none;">EN</a>
             <div class="cart-container">
                 <span class="cart" style="font-size: 1.5rem;">🛒</span>
                 <span id="cart-count" class="cart-badge">0</span>
             </div>
-            <a href="/login.html"><button class="login-btn">LOG IN</button></a>
+            <a href="/drukbasket/login.html"><button class="login-btn">LOG IN</button></a>
         </div>
     </header>
 
@@ -247,11 +247,11 @@
             setTimeout(() => {
                 // If user picks mBOB / mPay, send them to the payment gateway
                 if (paymentMethod === "mBOB / mPay") {
-                    window.location.href = "/Checkout/payment.html";
+                    window.location.href = "/drukbasket/Checkout/payment.html";
                 } else {
                     // Standard flow for Cash on Delivery
                     alert("Order recorded successfully! Please prepare cash for delivery.");
-                    window.location.href = "/index.html";
+                    window.location.href = "/drukbasket/index.html";
                 }
             }, 1200);
         };
