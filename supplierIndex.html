@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Druk Basket | Marketplace</title>
-    <script src="/auth.js"></script>
-    <link rel="stylesheet" href="/style.css">
+    <script src="/drukbasket/auth.js"></script>
+    <link rel="stylesheet" href="/drukbasket/style.css">
     <style>
 :root {
             --primary-green: #2d6a4f;
@@ -285,17 +285,17 @@
 
     <header class="navbar">
         <div class="logo-container">
-            <img src="Images/logo.png" alt="Drukbasket Logo" class="main-logo">
+            <img src="/drukbasket/Images/logo.png" alt="Drukbasket Logo" class="main-logo">
         </div>
         <nav>
-            <a href="/supplierIndex.html">Marketplace</a>
-            <a href="/aboutUs.html">About Us</a>
-            <a href="/contactUs.html">Contact Us</a>
-            <a href="/supplier-portal.html" class="nav-supplier-btn">Supplier Portal</a>
+            <a href="/drukbasket/supplierIndex.html">Marketplace</a>
+            <a href="/drukbasket/aboutUs.html">About Us</a>
+            <a href="/drukbasket/contactUs.html">Contact Us</a>
+            <a href="/drukbasket/supplier-portal.html" class="nav-supplier-btn">Supplier Portal</a>
         </nav>
 
         <div class="user-actions">
-            <a href="/market-prices.html" style="text-decoration: none;">
+            <a href="/drukbasket/market-prices.html" style="text-decoration: none;">
                 <div class="live-logo-container">
                     <span class="market-price">View Current Market Prices</span>
                     <div class="recording-circle">
@@ -304,16 +304,16 @@
                     </div>
                 </div>
             </a>
-            <a href="Dzongkha/index.html" style="text-decoration: none;">EN</a>
+            <a href="/drukbasket/Dzongkha/index.html" style="text-decoration: none;">EN</a>
 
             <div class="cart-container" style="position: relative; display: inline-block; cursor: pointer;"
-                onclick="window.location.href='/Addtocart/addToCart.html'">
+                onclick="window.location.href='/drukbasket/Addtocart/addToCart.html'">
                 <span class="cart" style="font-size: 1.5rem;">🛒</span>
                 <span id="cart-count" class="cart-badge">0</span>
             </div>
 
             <span class="notification">🔔</span>
-            <a href="/login.html" class="login-btn-link">
+            <a href="/drukbasket/login.html" class="login-btn-link">
                 <button class="login-btn">LOG IN</button>
             </a>
         </div>
@@ -532,7 +532,7 @@
                         <div class="card-content no-top">
                             <div class="btn-group">
                                 <button class="add-cart" onclick="addToCart('${p.name}', '${p.price}', '${p.unit}', '${p.img}', '${p.badge}')">ADD TO CART</button>
-                                <button class="preorder" onclick="window.location.href='/Preorder/preorder.html'">PREORDER</button>
+                                <button class="preorder" onclick="window.location.href='/drukbasket/Preorder/preorder.html'">PREORDER</button>
                             </div>
                         </div>
                     </div>
