@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Drukbasket</title>
-    <link rel="stylesheet" href="/style.css"> 
+    <link rel="stylesheet" href="/drukbasket/style.css"> 
     <style>
         /* Existing Styles */
         .live-logo-container { display: inline-flex; align-items: center; gap: 4px; }
@@ -81,16 +81,16 @@
     </div>
     <header class="navbar">
         <div class="logo-container">
-            <a href="/Admin/index.html"><img src="/Images/logo.png" alt="Drukbasket Logo" class="main-logo"></a>
+            <a href="/drukbasket/Admin/index.html"><img src="/Images/logo.png" alt="Drukbasket Logo" class="main-logo"></a>
         </div>
         <nav>
-            <a href="/Admin/index.html">Marketplace</a>
+            <a href="/drukbasket/Admin/index.html">Marketplace</a>
             <a href="#">Stories</a>
-            <a href="/Admin/">About Us</a>
-            <a href="/Admin/">Contact Us</a>
+            <a href="/drukbasket/Admin/">About Us</a>
+            <a href="/drukbasket/Admin/">Contact Us</a>
         </nav>
         <div class="user-actions">
-            <a href="/market-prices.html" style="text-decoration: none;">
+            <a href="/drukbasket/market-prices.html" style="text-decoration: none;">
                 <div class="live-logo-container">
                     <span class="market-price">View Current Market Prices</span>
                     <div class="recording-circle"><div class="inner-dot"></div><div class="outer-ring"></div></div>
@@ -99,14 +99,14 @@
             <a href="#" style="text-decoration: none;">EN</a>
 
             <span class="notification">🔔</span>
-            <a href="/Admin/login.html" class="login-btn-link">
+            <a href="/drukbasket/Admin/login.html" class="login-btn-link">
                 <button class="login-btn">LOG IN</button>
             </a>
         </div>
     </header>
     <main class="login-container">
         <div class="login-box">
-            <img src="/Images/logo.png" alt="Drukbasket" style="max-height: 50px; margin-bottom: 20px;">
+            <img src="/drukbasket/Images/logo.png" alt="Drukbasket" style="max-height: 50px; margin-bottom: 20px;">
             <h2>Admin Login</h2>
             <p>Access the management dashboard</p>
 
@@ -141,7 +141,7 @@
                 if(email === validEmail && pass === validPass) {
                     // Set secure admin session
                     localStorage.setItem('isAdminLoggedIn', 'true');
-                    window.location.href = "/Admin/index.html";
+                    window.location.href = "/drukbasket/Admin/index.html";
                 } else {
                     alert("Invalid Admin Credentials.");
                     btn.innerText = "ACCESS DASHBOARD";
