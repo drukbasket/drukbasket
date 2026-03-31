@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Market Prices | Druk Basket</title>
-    <script src="/auth.js"></script>
-    <link rel="stylesheet" href="/style.css">
+    <script src="auth.js"></script>
+    <link rel="stylesheet" href="style.css">
     <style>
         :root {
             --primary-green: #2d6a4f;
@@ -451,22 +451,22 @@
 
     <header class="navbar">
         <div class="logo-container">
-            <img src="Images/logo.png" alt="Drukbasket Logo" class="main-logo">
+            <img src="/drukbasket/Images/logo.png" alt="Drukbasket Logo" class="main-logo">
         </div>
         <nav>
-            <a href="/index.html">Marketplace</a>
-            <a href="/aboutUs.html">About Us</a>
-            <a href="/contactUs.html">Contact Us</a>
+            <a href="index.html">Marketplace</a>
+            <a href="aboutUs.html">About Us</a>
+            <a href="contactUs.html">Contact Us</a>
         </nav>
         <div class="user-actions">
-            <a href="/market-prices.html" style="text-decoration: none;">
+            <a href="market-prices.html" style="text-decoration: none;">
                 <div class="live-logo-container">
                     <div class="live-dot"></div>
                     <span class="market-price">Market Prices</span>
                     <span class="live-tag">Live</span>
                 </div>
             </a>
-            <a href="Dzongkha/index.html" style="text-decoration: none;">EN</a>
+            <a href="/drukbasket/Dzongkha/index.html" style="text-decoration: none;">EN</a>
 
             <div class="cart-container" style="position: relative; display: inline-block; cursor: pointer;">
                 <span class="cart" style="font-size: 1.5rem;">🛒</span>
@@ -474,7 +474,7 @@
             </div>
 
             <span class="notification">🔔</span>
-            <a href="/login.html" class="login-btn-link">
+            <a href="login.html" class="login-btn-link">
                 <button class="login-btn">LOG IN</button>
             </a>
         </div>
@@ -683,7 +683,7 @@
         window.addEventListener('pageshow', updateBadge);
 
         document.querySelector('.cart-container').addEventListener('click', () => {
-            window.location.href = '/Preorder/preorder.html';
+            window.location.href = '/drukbasket/Preorder/preorder.html';
         });
 
         // Init
