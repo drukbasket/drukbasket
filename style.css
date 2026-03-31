@@ -317,6 +317,25 @@ html {
     border: 2px solid #fff;
     display: none; /* Hidden when cart is empty */
 }
+/* --- Mobile: Fix navbar alignment --- */
+@media (max-width: 720px) {
+    .hamburger {
+        display: flex;
+    }
+
+    .logo-container {
+        flex: 0 0 auto;
+    }
+
+    .user-actions {
+        flex: 0 1 auto;
+        justify-content: flex-end;
+    }
+
+    .navbar {
+        flex-wrap: wrap;
+    }
+}
 
 
 
