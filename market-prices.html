@@ -4,45 +4,446 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Market Prices | Druk Basket</title>
-    <script src="/drukbasket/auth.js"></script>
-    <link rel="stylesheet" href="/drukbasket/style.css">
+    <script src="/auth.js"></script>
+    <link rel="stylesheet" href="/style.css">
     <style>
+        :root {
+            --primary-green: #2d6a4f;
+            --primary-green-dark: #1f4d38;
+            --primary-green-soft: #edf7f1;
+            --accent-orange: #e67e22;
+            --light-bg: #f6faf7;
+            --card-bg: #ffffff;
+            --text-dark: #21352b;
+            --text-soft: #6f7f76;
+            --border-soft: rgba(45, 106, 79, 0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(180deg, #f4faf6 0%, #eef7f1 45%, #fbfdfb 100%);
+            margin: 0;
+            color: var(--text-dark);
+        }
+
         /* Header Logo Styling */
-        .live-logo-container { display: inline-flex; align-items: center; gap: 4px; }
-        .recording-circle { position: relative; width: 20px; height: 20px; animation: simplePulse 1.5s infinite; }
-        .inner-dot { width: 12px; height: 12px; background: #ff0000; border-radius: 50%; position: absolute; top: 4px; left: 4px; }
-        .outer-ring { width: 20px; height: 20px; border: 1px solid #ff0000; border-radius: 50%; }
-        @keyframes simplePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .live-logo-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--primary-green-soft);
+            padding: 9px 16px;
+            border-radius: 14px;
+            border: 1.5px solid rgba(45, 106, 79, 0.2);
+            color: var(--primary-green);
+            font-weight: 700;
+            font-size: 0.86rem;
+            transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .live-logo-container:hover {
+            background: rgba(45, 106, 79, 0.1);
+            border-color: var(--primary-green);
+            box-shadow: 0 4px 14px rgba(45, 106, 79, 0.12);
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary-green);
+            border-radius: 50%;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .live-dot::after {
+            content: "";
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: rgba(45, 106, 79, 0.25);
+            animation: livePulse 2s ease-in-out infinite;
+        }
+        .live-tag {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--primary-green);
+        }
+        @keyframes livePulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.8); opacity: 0; }
+        }
 
-        /* Market Table Styling */
-        .market-container { max-width: 1100px; margin: 40px auto; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-        .market-header { margin-bottom: 30px; }
-        .market-header h1 { font-size: 1.6rem; margin-bottom: 5px; color: #333; }
-        .market-header p { color: #777; font-size: 0.95rem; }
-        .highlight-text { color: #ff4d4d; font-weight: bold; }
+        /* ── Hero Banner ── */
+        .market-hero {
+            background: linear-gradient(135deg, #1f5c42 0%, #2d6a4f 45%, #4ca276 100%);
+            color: #fff;
+            padding: 40px 5% 32px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-        /* Search Bar */
-        .search-wrapper { margin-bottom: 20px; }
-        #marketSearch { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 1rem; }
+        .market-hero h1 {
+            margin: 0 0 8px;
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            font-weight: 800;
+        }
 
-        .price-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 10px; border-bottom: 1px solid #eee; transition: 0.2s; }
-        .price-row:hover { background-color: #fcfcfc; }
-        .item-name { font-weight: 600; color: #444; flex: 1; }
-        .price-group { display: flex; gap: 15px; flex-wrap: wrap; }
+        .market-hero p {
+            margin: 0;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.6;
+        }
 
-        .price-card { background: #fff9f0; border: 1px solid #ffe8cc; border-radius: 8px; padding: 10px; min-width: 160px; text-align: center; }
-        .price-val { display: block; color: #e67e22; font-weight: bold; font-size: 0.9rem; }
-        .price-date { font-size: 0.7rem; color: #f39c12; font-weight: bold; }
+        .market-hero .location-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 14px;
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
 
-        .out-of-season { background: #fff5f5; border-color: #ffdada; }
-        .out-of-season .price-val { color: #ff4d4d; }
-        .out-of-season .price-date { color: #ff9999; }
+        .hero-stats-row {
+            display: flex;
+            gap: 16px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
 
-        /* Responsive */
+        .hero-stat {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            padding: 14px 18px;
+            min-width: 120px;
+        }
+
+        .hero-stat strong {
+            display: block;
+            font-size: 1.4rem;
+        }
+
+        .hero-stat span {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* ── Search Bar (sticky) ── */
+        .search-sticky {
+            position: sticky;
+            top: 0;
+            z-index: 99;
+            padding: 14px 5%;
+            background: linear-gradient(180deg, #f4faf6 0%, rgba(244, 250, 246, 0.95) 80%, rgba(244, 250, 246, 0) 100%);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: 18px;
+            border: 1px solid var(--border-soft);
+            box-shadow: 0 10px 30px rgba(20, 50, 32, 0.06);
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 1px solid #d6e2da;
+            border-radius: 12px;
+            font-size: 1rem;
+            color: var(--text-dark);
+            background: #fff;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .search-bar input:focus {
+            border-color: rgba(45, 106, 79, 0.45);
+            box-shadow: 0 0 0 4px rgba(45, 106, 79, 0.08);
+        }
+
+        .filter-tabs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 2px solid #d6e2da;
+            background: #fff;
+            color: var(--text-dark);
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: background 0.18s, color 0.18s, border-color 0.18s;
+        }
+
+        .filter-tab:hover {
+            border-color: var(--primary-green);
+            color: var(--primary-green);
+        }
+
+        .filter-tab.active {
+            background: var(--primary-green);
+            color: #fff;
+            border-color: var(--primary-green);
+        }
+
+        /* ── Results Count ── */
+        .results-info {
+            padding: 8px 5% 0;
+            font-size: 0.9rem;
+            color: var(--text-soft);
+            font-weight: 600;
+        }
+
+        /* ── Price Table ── */
+        .market-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 5% 60px;
+        }
+
+        /* Column Headers */
+        .table-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 80px;
+            gap: 12px;
+            padding: 12px 20px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-soft);
+            border-bottom: 2px solid var(--border-soft);
+        }
+
+        /* Price Row */
+        .price-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 80px;
+            gap: 12px;
+            align-items: center;
+            padding: 16px 20px;
+            background: var(--card-bg);
+            border-bottom: 1px solid rgba(45, 106, 79, 0.06);
+            border-radius: 0;
+            transition: background 0.15s ease;
+        }
+
+        .price-row:first-child {
+            border-radius: 16px 16px 0 0;
+        }
+
+        .price-row:last-child {
+            border-radius: 0 0 16px 16px;
+            border-bottom: none;
+        }
+
+        .price-row:only-child {
+            border-radius: 16px;
+        }
+
+        .price-row:hover {
+            background: var(--primary-green-soft);
+        }
+
+        .item-name {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .price-val {
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--primary-green);
+        }
+
+        .price-val.out {
+            color: #c0392b;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .prev-price {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-soft);
+        }
+
+        .prev-price.out {
+            color: #e57373;
+            font-size: 0.82rem;
+        }
+
+        /* Trend indicator */
+        .trend {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+
+        .trend.up {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .trend.down {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .trend.same {
+            background: #f5f5f5;
+            color: #999;
+        }
+
+        .trend.seasonal {
+            background: #fce4ec;
+            color: #c62828;
+            font-size: 0.72rem;
+        }
+
+        /* No results */
+        .no-results {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-soft);
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            border: 1px dashed #c9d8cf;
+        }
+
+        /* ── Responsive ── */
         @media (max-width: 768px) {
-            .price-row { flex-direction: column; align-items: flex-start; gap: 10px; }
-            .price-group { width: 100%; }
-            .price-card { flex: 1; }
+            .market-hero {
+                padding: 28px 5% 24px;
+            }
+
+            .hero-stats-row {
+                gap: 10px;
+            }
+
+            .hero-stat {
+                padding: 10px 14px;
+                min-width: 90px;
+            }
+
+            .hero-stat strong {
+                font-size: 1.1rem;
+            }
+
+            .search-bar {
+                flex-direction: column;
+            }
+
+            .table-header {
+                display: none;
+            }
+
+            .price-row {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto auto;
+                gap: 6px 12px;
+                padding: 14px 16px;
+                border-radius: 14px;
+                margin-bottom: 8px;
+                border: 1px solid var(--border-soft);
+                box-shadow: 0 4px 12px rgba(20, 50, 32, 0.04);
+            }
+
+            .price-row:first-child,
+            .price-row:last-child,
+            .price-row:only-child {
+                border-radius: 14px;
+            }
+
+            .item-name {
+                grid-column: 1 / -1;
+                font-size: 1rem;
+                padding-bottom: 4px;
+                border-bottom: 1px solid rgba(45, 106, 79, 0.06);
+                margin-bottom: 2px;
+            }
+
+            .price-val, .prev-price {
+                font-size: 0.88rem;
+            }
+
+            .price-val::before {
+                content: "Now: ";
+                font-weight: 600;
+                color: var(--text-soft);
+                font-size: 0.72rem;
+            }
+
+            .prev-price::before {
+                content: "Prev: ";
+                font-weight: 600;
+                color: var(--text-soft);
+                font-size: 0.72rem;
+            }
+
+            .trend {
+                justify-self: end;
+            }
+
+            .filter-tab {
+                padding: 8px 12px;
+                font-size: 0.82rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .market-hero h1 {
+                font-size: 1.3rem;
+            }
+
+            .market-hero .location-badge {
+                font-size: 0.78rem;
+            }
+
+            .hero-stat {
+                min-width: 0;
+                flex: 1;
+            }
+
+            .search-bar input {
+                padding: 12px 14px;
+                font-size: 0.92rem;
+            }
+
+            .price-row {
+                padding: 12px 14px;
+            }
+
+            .item-name {
+                font-size: 0.92rem;
+            }
         }
     </style>
 </head>
@@ -53,44 +454,66 @@
             <img src="Images/logo.png" alt="Drukbasket Logo" class="main-logo">
         </div>
         <nav>
-            <a href="/drukbasket/index.html">Marketplace</a>
-            <a href="/drukbasket/aboutUs.html">About Us</a>
-            <a href="/drukbasket/contactUs.html">Contact Us</a>
+            <a href="/index.html">Marketplace</a>
+            <a href="/aboutUs.html">About Us</a>
+            <a href="/contactUs.html">Contact Us</a>
         </nav>
         <div class="user-actions">
-            <a href="/drukbasket/market-prices.html" style="text-decoration: none;">
+            <a href="/market-prices.html" style="text-decoration: none;">
                 <div class="live-logo-container">
-                    <span class="market-price">View Current Market Prices</span>
-                    <div class="recording-circle"><div class="inner-dot"></div><div class="outer-ring"></div></div>
+                    <div class="live-dot"></div>
+                    <span class="market-price">Market Prices</span>
+                    <span class="live-tag">Live</span>
                 </div>
             </a>
-            <a href="/drukbasket/Dzongkha/index.html" style="text-decoration: none;">EN</a>
-            
+            <a href="Dzongkha/index.html" style="text-decoration: none;">EN</a>
+
             <div class="cart-container" style="position: relative; display: inline-block; cursor: pointer;">
                 <span class="cart" style="font-size: 1.5rem;">🛒</span>
                 <span id="cart-count" class="cart-badge">0</span>
             </div>
 
             <span class="notification">🔔</span>
-            <a href="/drukbasket/login.html" class="login-btn-link">
+            <a href="/login.html" class="login-btn-link">
                 <button class="login-btn">LOG IN</button>
             </a>
         </div>
-    </header> 
+    </header>
 
-    <main class="market-container">
-        <div class="market-header">
-            <h1>Market Price This Week</h1>
-            <p>These are the market prices for various farm produce at the <span class="highlight-text">Thimphu Centenary Farmers Market</span></p>
+    <!-- Hero Banner -->
+    <section class="market-hero">
+        <h1>Market Prices This Week</h1>
+        <p>Live pricing for farm produce updated weekly</p>
+        <div class="location-badge">
+            📍 Thimphu Centenary Farmers Market
         </div>
+        <div class="hero-stats-row" id="heroStats"></div>
+    </section>
 
-        <div class="search-wrapper">
-            <input type="text" id="marketSearch" placeholder="Search for a vegetable, fruit or product...">
-        </div>
-
-        <div class="price-list" id="priceListContainer">
+    <!-- Sticky Search -->
+    <div class="search-sticky">
+        <div class="search-bar">
+            <input type="text" id="marketSearch" placeholder="🔍  Search vegetables, fruits, products...">
+            <div class="filter-tabs" role="group" aria-label="Filter">
+                <button class="filter-tab active" data-filter="all">All</button>
+                <button class="filter-tab" data-filter="season">In Season</button>
+                <button class="filter-tab" data-filter="out">Out of Season</button>
             </div>
-    </main>
+        </div>
+    </div>
+
+    <p class="results-info" id="resultsInfo"></p>
+
+    <!-- Price Table -->
+    <div class="market-container">
+        <div class="table-header">
+            <span>Product</span>
+            <span>Current Price</span>
+            <span>Previous Price</span>
+            <span>Trend</span>
+        </div>
+        <div class="price-list" id="priceListContainer"></div>
+    </div>
 
     <script>
         const marketData = [
@@ -150,37 +573,98 @@
         const container = document.getElementById('priceListContainer');
         const searchInput = document.getElementById('marketSearch');
         const cartBadge = document.getElementById('cart-count');
+        const resultsInfo = document.getElementById('resultsInfo');
+        const filterTabs = document.querySelectorAll('.filter-tab');
+        let activeFilter = 'all';
 
-        // 1. RENDER MARKET PRICES
+        // Parse price number from string like "300/KG"
+        function parsePrice(str) {
+            if (!str || str === "OUT OF SEASON") return null;
+            return parseFloat(str);
+        }
+
+        // Get trend between current and previous
+        function getTrend(current, prev) {
+            const c = parsePrice(current);
+            const p = parsePrice(prev);
+            if (c === null) return 'seasonal';
+            if (p === null) return 'same';
+            if (c > p) return 'up';
+            if (c < p) return 'down';
+            return 'same';
+        }
+
+        function getTrendLabel(trend) {
+            if (trend === 'up') return '<span class="trend up">▲ Up</span>';
+            if (trend === 'down') return '<span class="trend down">▼ Down</span>';
+            if (trend === 'seasonal') return '<span class="trend seasonal">— N/A</span>';
+            return '<span class="trend same">— Same</span>';
+        }
+
+        // Hero stats
+        function renderHeroStats() {
+            const total = marketData.length;
+            const inSeason = marketData.filter(i => i.season).length;
+            const outSeason = total - inSeason;
+            document.getElementById('heroStats').innerHTML = `
+                <div class="hero-stat"><strong>${total}</strong><span>Total Products</span></div>
+                <div class="hero-stat"><strong>${inSeason}</strong><span>In Season</span></div>
+                <div class="hero-stat"><strong>${outSeason}</strong><span>Out of Season</span></div>
+            `;
+        }
+
+        // Filter tabs
+        filterTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                filterTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                activeFilter = tab.dataset.filter;
+                renderFiltered();
+            });
+        });
+
+        function getFilteredData() {
+            const term = searchInput.value.toLowerCase();
+            return marketData.filter(item => {
+                const matchSearch = item.name.toLowerCase().includes(term);
+                if (activeFilter === 'season') return matchSearch && item.season;
+                if (activeFilter === 'out') return matchSearch && !item.season;
+                return matchSearch;
+            });
+        }
+
+        function renderFiltered() {
+            const data = getFilteredData();
+            resultsInfo.textContent = `${data.length} product${data.length !== 1 ? 's' : ''} found`;
+            renderPrices(data);
+        }
+
         function renderPrices(data) {
             container.innerHTML = '';
+            if (data.length === 0) {
+                container.innerHTML = '<div class="no-results">No products found matching your search.</div>';
+                return;
+            }
+
             data.forEach(item => {
                 const row = document.createElement('div');
                 row.className = 'price-row';
-                
-                const currentClass = item.current === "OUT OF SEASON" ? "price-card out-of-season" : "price-card";
-                const prevClass = item.prev === "OUT OF SEASON" ? "price-card out-of-season" : "price-card";
+                const trend = getTrend(item.current, item.prev);
+                const isOut = item.current === "OUT OF SEASON";
+                const prevOut = item.prev === "OUT OF SEASON";
 
                 row.innerHTML = `
                     <span class="item-name">${item.name}</span>
-                    <div class="price-group">
-                        <div class="${currentClass}">
-                            <span class="price-val">${item.current === "OUT OF SEASON" ? "" : "NU. "}${item.current}</span>
-                            <span class="price-date">APR 26TH - MAY 3RD</span>
-                        </div>
-                        <div class="${prevClass}">
-                            <span class="price-val">${item.prev === "OUT OF SEASON" ? "" : "NU. "}${item.prev}</span>
-                            <span class="price-date">OCT 5TH - OCT 12TH</span>
-                        </div>
-                    </div>
+                    <span class="price-val${isOut ? ' out' : ''}">${isOut ? 'Out of Season' : 'Nu. ' + item.current}</span>
+                    <span class="prev-price${prevOut ? ' out' : ''}">${prevOut ? 'Out of Season' : 'Nu. ' + item.prev}</span>
+                    ${getTrendLabel(trend)}
                 `;
                 container.appendChild(row);
             });
         }
 
-        // 2. UNIFIED CART BADGE LOGIC
+        // Cart badge
         function updateBadge() {
-            // We read the actual array length instead of a standalone number
             const cart = JSON.parse(localStorage.getItem('drukCart')) || [];
             if (cart.length > 0) {
                 cartBadge.innerText = cart.length;
@@ -190,32 +674,21 @@
             }
         }
 
-        // 3. EVENT LISTENERS
-        
-        // Search Functionality
-        searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            const filtered = marketData.filter(item => item.name.toLowerCase().includes(term));
-            renderPrices(filtered);
-        });
+        // Events
+        searchInput.addEventListener('input', renderFiltered);
 
-        // Listen for changes from other tabs (like when deleting in preorder.html)
         window.addEventListener('storage', (e) => {
-            if (e.key === 'drukCart') {
-                updateBadge();
-            }
+            if (e.key === 'drukCart') updateBadge();
         });
-
-        // Update badge when coming back via the browser "Back" button
         window.addEventListener('pageshow', updateBadge);
 
-        // Make the cart icon clickable
         document.querySelector('.cart-container').addEventListener('click', () => {
-            window.location.href = '/drukbasket/Preorder/preorder.html';
+            window.location.href = '/Preorder/preorder.html';
         });
 
-        // INITIALIZE
-        renderPrices(marketData);
+        // Init
+        renderHeroStats();
+        renderFiltered();
         updateBadge();
     </script>
 </body>
