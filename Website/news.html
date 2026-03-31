@@ -6,38 +6,43 @@
   <title>News | Druk Basket</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .news-card { padding: 0; overflow: hidden; }
+    .news-card { padding: 0; overflow: hidden; cursor: default; }
+    .news-card:hover { transform: translateY(-4px); }
     .news-img {
-      height: 180px;
-      background: linear-gradient(135deg, var(--green-light), #d4edda);
+      height: 160px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.5rem;
+      font-size: 2.2rem;
     }
-    .news-body { padding: 20px 24px 24px; }
-    .news-body h3 { font-size: 1.12rem; font-weight: 700; margin: 10px 0 6px; line-height: 1.4; }
-    .news-date { color: var(--muted); font-size: 0.84rem; font-weight: 600; }
-    .news-desc { margin-top: 10px; color: var(--text-light); font-size: 0.92rem; line-height: 1.6; }
+    .news-img.update { background: linear-gradient(135deg, #e3f2fd, #bbdefb); }
+    .news-img.market { background: linear-gradient(135deg, #fff3e0, #ffe0b2); }
+    .news-img.training { background: linear-gradient(135deg, #f3e5f5, #e1bee7); }
+    .news-body { padding: 18px 22px 22px; }
+    .news-body h3 { font-size: 1.05rem; font-weight: 700; margin: 10px 0 5px; line-height: 1.4; }
+    .news-date { color: var(--muted); font-size: 0.8rem; font-weight: 600; }
+    .news-desc { margin-top: 8px; color: var(--text-light); font-size: 0.88rem; line-height: 1.65; }
     .toolbar {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
       margin-bottom: 28px;
     }
-    .toolbar input, .toolbar select {
-      max-width: 280px;
+    .toolbar input, .toolbar select { max-width: 260px; }
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+      font-weight: 600;
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
   <div class="nav-wrap">
     <div class="nav">
-      <div class="logo-container">
-        <img src="/Images/logo.png" alt="Druk Basket Logo" class="main-logo" />
-      </div>
+      <div class="logo-container"><img src="/Images/logo.png" alt="Druk Basket Logo" class="main-logo" /></div>
       <div class="nav-left">
         <a href="home.html">Home</a>
         <a href="team.html">Our Team</a>
@@ -46,26 +51,18 @@
         <a href="feedback.html">Feedback</a>
         <a href="contact.html">Contact</a>
       </div>
-      <div class="nav-right">
-        <a href="staff.html">Staff Area</a>
-      </div>
+      <div class="nav-right"><a href="staff.html">Staff Area</a></div>
     </div>
   </div>
 
-  <!-- PAGE HEADER -->
   <div class="page-header">
     <div class="page-header-inner">
-      <div class="breadcrumb">
-        <a href="home.html">Home</a>
-        <span class="sep">/</span>
-        <span>News</span>
-      </div>
+      <div class="breadcrumb"><a href="home.html">Home</a><span class="sep">/</span><span>News</span></div>
       <h1>News & Updates</h1>
       <p>Platform updates, announcements, and highlights from the Druk Basket community.</p>
     </div>
   </div>
 
-  <!-- CONTENT -->
   <div class="section">
     <div class="toolbar">
       <input id="q" type="text" placeholder="Search news..." />
@@ -76,46 +73,17 @@
         <option value="training">Training</option>
       </select>
     </div>
-
     <div id="newsGrid" class="grid-3"></div>
   </div>
 
-  <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-inner">
-      <div class="footer-brand">
-        <h3>Druk Basket</h3>
-        <p>Bhutan's own agricultural marketplace connecting farmers directly to buyers.</p>
-      </div>
-      <div>
-        <h4>Quick Links</h4>
-        <ul>
-          <li><a href="home.html">Home</a></li>
-          <li><a href="team.html">Our Team</a></li>
-          <li><a href="news.html">News</a></li>
-          <li><a href="stories.html">Stories</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Platform</h4>
-        <ul>
-          <li><a href="/index.html">Marketplace</a></li>
-          <li><a href="/market-prices.html">Market Prices</a></li>
-          <li><a href="/login.html">Login</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Contact</h4>
-        <ul>
-          <li><a href="contact.html">Contact Us</a></li>
-          <li><a href="feedback.html">Give Feedback</a></li>
-        </ul>
-      </div>
+      <div class="footer-brand"><h3>Druk Basket</h3><p>Bhutan's own agricultural marketplace connecting farmers directly to buyers.</p></div>
+      <div><h4>Quick Links</h4><ul><li><a href="home.html">Home</a></li><li><a href="team.html">Our Team</a></li><li><a href="news.html">News</a></li><li><a href="stories.html">Stories</a></li></ul></div>
+      <div><h4>Platform</h4><ul><li><a href="/index.html">Marketplace</a></li><li><a href="/market-prices.html">Market Prices</a></li><li><a href="/login.html">Login</a></li></ul></div>
+      <div><h4>Contact</h4><ul><li><a href="contact.html">Contact Us</a></li><li><a href="feedback.html">Give Feedback</a></li></ul></div>
     </div>
-    <div class="footer-bottom">
-      <span>2026 Druk Basket. All rights reserved.</span>
-      <span>Ministry of Agriculture & Livestock, Bhutan</span>
-    </div>
+    <div class="footer-bottom"><span>2026 Druk Basket. All rights reserved.</span><span>Ministry of Agriculture & Livestock, Bhutan</span></div>
   </footer>
 
   <script>
@@ -135,16 +103,14 @@
     function render() {
       const query = q.value.trim().toLowerCase();
       const cat = category.value;
-
       const filtered = news.filter(n => {
         const matchQ = !query || n.title.toLowerCase().includes(query) || n.desc.toLowerCase().includes(query);
         const matchCat = cat === "all" || n.cat === cat;
         return matchQ && matchCat;
       });
-
       grid.innerHTML = filtered.map(n => `
         <div class="card news-card">
-          <div class="news-img">${n.icon}</div>
+          <div class="news-img ${n.cat}">${n.icon}</div>
           <div class="news-body">
             <span class="tag ${n.cat}">${n.tag}</span>
             <h3>${n.title}</h3>
@@ -152,13 +118,12 @@
             <div class="news-desc">${n.desc}</div>
           </div>
         </div>
-      `).join("") || `<div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--muted);">No news found matching your search.</div>`;
+      `).join("") || `<div class="empty-state">No news found matching your search.</div>`;
     }
 
     q.addEventListener("input", render);
     category.addEventListener("change", render);
     render();
   </script>
-
 </body>
 </html>
