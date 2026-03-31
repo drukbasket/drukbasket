@@ -51,27 +51,25 @@
             border-bottom: 1px solid rgba(45, 106, 79, 0.08);
         }
         .login-btn {
-            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
-            color: #fff;
-            border: none;
+            background: #fff;
+            color: var(--primary-green);
+            border: 2px solid var(--primary-green);
             padding: 10px 22px;
-            border-radius: 12px;
+            border-radius: 999px;
             font-weight: 800;
             font-size: 0.9rem;
             cursor: pointer;
             letter-spacing: 0.03em;
-            box-shadow: 0 6px 16px rgba(31, 77, 56, 0.2);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: background 0.2s ease, color 0.2s ease;
         }
 
         .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 22px rgba(31, 77, 56, 0.3);
+            background: var(--primary-green);
+            color: #fff;
         }
 
         .login-btn:active {
-            transform: translateY(0);
-            box-shadow: none;
+            transform: translateY(1px);
         }
 
         .hamburger {
