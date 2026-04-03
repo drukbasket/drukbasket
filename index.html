@@ -1127,7 +1127,7 @@
         }
 
         function talkWelcome() {
-            speak("Kuzu zangpo Gara lu. Welcome to Druk Basket. Type key word in search area. Or choose category. Tap product to hear price. Press Add to Cart to buy. Press Preorder to advance demand the product");
+            speak("Kuzu zangpo Gayra lu. Nga chay Druke Basket na lu joen pa lay so. Type key word in search area. Or choose category. Tap product to hear price. Press Add to Cart to buy. Press Preorder to advance demand the product");
         }
 
         talkBtn.addEventListener('click', () => {
@@ -1234,7 +1234,7 @@
                         if (btn.dataset.action === 'cart') {
                             addToCart(name, price, unit, img, badge);
                         } else if (btn.dataset.action === 'preorder') {
-                            window.location.href = '/Preorder/preorder.html';
+                            window.location.href = '/drukbasket/Preorder/preorder.html';
                         }
                         return;
                     }
