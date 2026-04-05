@@ -10,7 +10,7 @@
         .container { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 500px; width: 100%; text-align: center; }
         .scanner-box { width: 100%; height: 250px; background: #111; margin: 20px 0; border-radius: 15px; position: relative; overflow: hidden; border: 3px solid #333; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         #preview-img { max-width: 100%; max-height: 100%; display: none; z-index: 2; border-radius: 10px; }
-        .viewfinder-text { color: #888; position: absolute; z-index: 1; pointer-events: none; }
+        .viewfinder-text { color: #888; position: absolute; z-index: 1; pointer-events: none; font-size: 0.9rem; }
         .laser { width: 100%; height: 4px; background: #00ff88; position: absolute; box-shadow: 0 0 15px #00ff88; display: none; z-index: 3; }
         @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
         .scanning .laser { display: block; animation: scan 1.5s infinite alternate linear; }
@@ -25,49 +25,73 @@
         .badge-fail { background: #fce8e6; color: #d93025; }
         .report-btn { background: #d93025; font-size: 0.8rem; padding: 10px; }
         .hidden { display: none; }
+
+#scan-status { font-size: 0.85rem; color: #666; margin-top: 5px; min-height: 20px; }
+        .status-error { color: #d93025 !important; font-weight: bold; }
+        .status-success { color: #1e8e3e !important; font-weight: bold; }
+
+        .mode-toggle { display: flex; gap: 8px; margin-bottom: 15px; }
+        .mode-toggle button { flex: 1; padding: 10px; font-size: 0.85rem; border-radius: 25px; }
+        .mode-toggle button.active { background: #1a73e8; }
+        .mode-toggle button:not(.active) { background: #e0e0e0; color: #333; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h2>GI Product Authenticator</h2>
-        <p>Click the <b>Viewfinder</b> to select photo</p>
-        
-        <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+        <p style="font-size: 0.9rem;">Scan a QR code to verify product authenticity</p>
 
-        <div id="scanner-container" class="scanner-box" onclick="triggerUpload()">
-            <div class="laser"></div>
-            <div id="v-text" class="viewfinder-text">Click here to select photo...</div>
-            <img id="preview-img" alt="Product Preview">
+        <div class="mode-toggle">
+            <button id="mode-camera" class="active" onclick="setMode('camera')">Camera Scan</button>
+            <button id="mode-upload" onclick="setMode('upload')">Upload QR Image</button>
         </div>
 
-        <button id="scan-btn" onclick="startScan()" disabled>Scan Product</button>
+        <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+
+        <div id="scanner-container" class="scanner-box" onclick="handleScannerClick()">
+            <div class="laser"></div>
+            <div id="v-text" class="viewfinder-text">Tap to start camera...</div>
+            <video id="camera-preview" autoplay playsinline style="width:100%; height:100%; object-fit:cover; display:none; z-index:2;"></video>
+            <img id="preview-img" alt="Product Preview">
+            <canvas id="scan-canvas" class="hidden"></canvas>
+        </div>
+
+        <button id="scan-btn" onclick="startScan()" disabled>Scan QR Code</button>
+        <div id="scan-status"></div>
 
         <div id="result-card" class="hidden">
             <div id="badge-container"></div>
             <h3 id="product-name" style="margin: 5px 0;"></h3>
             <p id="product-origin" style="font-size: 0.9rem; color: #666;"></p>
+            <p id="product-id" style="font-size: 0.75rem; color: #999;"></p>
             <div id="process-details"></div>
-            
+
             <div id="map-section" class="map-container">
                 <div id="map"></div>
             </div>
             <div id="action-section" style="margin-top: 15px;"></div>
         </div>
+
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <script>
         let map;
         let marker;
-        let lastIndex = -1;
+        let currentMode = 'camera';
+        let cameraStream = null;
+        let scanning = false;
 
-        const giDatabase = [
-            { 
-                name: "Bhutanese Areca Nut (Doma)", 
+        // Product database keyed by QR code content
+        const giDatabase = {
+            "GI-BT-DOMA-001": {
+                name: "Bhutanese Areca Nut (Doma)",
                 isVerified: true,
-                origin: "Phuntsholing Foothills", 
+                origin: "Phuntsholing Foothills",
                 lat: 26.85, lng: 89.38,
+                giId: "GI-BT-DOMA-001",
                 process: {
                     sourcing: "Mature, heavy nuts (18–25g) from healthy trees[cite: 5, 8].",
                     nursery: "Seeds soaked 24–48 hours; 6–12 month nursery period[cite: 13, 19].",
@@ -75,91 +99,201 @@
                     storage: "Stored at 15–25°C on wooden pallets[cite: 82, 85]."
                 }
             },
-            {
+            "IMPORT-ARECA-FAKE-099": {
                 name: "Imported Areca Nut",
                 isVerified: false,
                 origin: "Unknown / Non-GI Source",
                 lat: 26.00, lng: 89.00,
+                giId: "IMPORT-ARECA-FAKE-099",
                 process: {
                     reason: "Fails weight criteria (below 18g) and lacks local nursery traceability[cite: 8, 19]."
                 }
             }
-        ];
+        };
 
-        function triggerUpload() { document.getElementById('file-input').click(); }
+        // ── Mode switching ──
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('mode-camera').classList.toggle('active', mode === 'camera');
+            document.getElementById('mode-upload').classList.toggle('active', mode === 'upload');
 
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.getElementById('preview-img');
-                    img.src = e.target.result;
-                    img.style.display = 'block';
-                    document.getElementById('v-text').style.display = 'none';
-                    document.getElementById('scan-btn').disabled = false;
-                    document.getElementById('result-card').classList.add('hidden');
-                }
-                reader.readAsDataURL(file);
+            stopCamera();
+            const img = document.getElementById('preview-img');
+            img.style.display = 'none';
+            document.getElementById('camera-preview').style.display = 'none';
+            document.getElementById('v-text').style.display = 'block';
+            document.getElementById('v-text').textContent = mode === 'camera' ? 'Tap to start camera...' : 'Tap to upload QR image...';
+            document.getElementById('scan-btn').disabled = true;
+            document.getElementById('scan-btn').innerText = 'Scan QR Code';
+            document.getElementById('scan-status').textContent = '';
+            document.getElementById('result-card').classList.add('hidden');
+        }
+
+        function handleScannerClick() {
+            if (currentMode === 'upload') {
+                document.getElementById('file-input').click();
+            } else {
+                startCamera();
             }
         }
 
+        // ── Camera mode ──
+        async function startCamera() {
+            if (cameraStream) return; // already running
+            try {
+                const video = document.getElementById('camera-preview');
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
+                });
+                video.srcObject = cameraStream;
+                video.style.display = 'block';
+                document.getElementById('v-text').style.display = 'none';
+                document.getElementById('preview-img').style.display = 'none';
+                document.getElementById('scan-btn').disabled = false;
+                document.getElementById('scan-btn').innerText = 'Scan QR Code';
+                document.getElementById('scan-status').textContent = 'Camera ready. Point at a QR code and tap Scan.';
+            } catch (err) {
+                document.getElementById('scan-status').innerHTML = '<span class="status-error">Camera access denied. Switch to Upload mode.</span>';
+            }
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(t => t.stop());
+                cameraStream = null;
+                document.getElementById('camera-preview').style.display = 'none';
+                document.getElementById('camera-preview').srcObject = null;
+            }
+            scanning = false;
+        }
+
+        // ── File upload mode ──
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('preview-img');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                document.getElementById('v-text').style.display = 'none';
+                document.getElementById('scan-btn').disabled = false;
+                document.getElementById('scan-btn').innerText = 'Scan QR Code';
+                document.getElementById('scan-status').textContent = 'Image loaded. Tap Scan to decode QR code.';
+                document.getElementById('result-card').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+            // Reset so the same file can be re-selected
+            event.target.value = '';
+        }
+
+        // ── Scanning ──
         function startScan() {
             const btn = document.getElementById('scan-btn');
             const scanner = document.getElementById('scanner-container');
+            const status = document.getElementById('scan-status');
+
             btn.disabled = true;
-            btn.innerText = "Analyzing GI Metadata...";
+            btn.innerText = "Scanning for QR Code...";
             scanner.classList.add('scanning');
+            status.textContent = 'Analyzing image for QR codes...';
 
             setTimeout(() => {
-                let randomIndex;
-                do { randomIndex = Math.floor(Math.random() * giDatabase.length); } 
-                while (randomIndex === lastIndex && giDatabase.length > 1);
-                
-                lastIndex = randomIndex;
-                showResult(giDatabase[randomIndex]);
+                let qrData = null;
+
+                if (currentMode === 'camera') {
+                    qrData = decodeFromVideo();
+                } else {
+                    qrData = decodeFromImage();
+                }
+
                 scanner.classList.remove('scanning');
+
+                if (qrData) {
+                    const product = giDatabase[qrData];
+                    if (product) {
+                        status.innerHTML = '<span class="status-success">QR decoded: ' + qrData + '</span>';
+                        showResult(product);
+                    } else {
+                        status.innerHTML = '<span class="status-error">QR code "' + qrData + '" not found in GI registry.</span>';
+                        document.getElementById('result-card').classList.add('hidden');
+                    }
+                } else {
+                    status.innerHTML = '<span class="status-error">No QR code detected. Try a clearer image.</span>';
+                    document.getElementById('result-card').classList.add('hidden');
+                }
+
                 btn.disabled = false;
-                btn.innerText = "Scan Another Product";
-            }, 2000);
+                btn.innerText = 'Scan Again';
+            }, 1500);
         }
 
+        function decodeFromVideo() {
+            const video = document.getElementById('camera-preview');
+            if (!video.srcObject || video.videoWidth === 0) return null;
+
+            const canvas = document.getElementById('scan-canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            ctx.drawImage(video, 0, 0);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, canvas.width, canvas.height, { inversionAttempts: 'dontInvert' });
+            return code ? code.data : null;
+        }
+
+        function decodeFromImage() {
+            const img = document.getElementById('preview-img');
+            if (!img.src || img.naturalWidth === 0) return null;
+
+            const canvas = document.getElementById('scan-canvas');
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            ctx.drawImage(img, 0, 0);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, canvas.width, canvas.height, { inversionAttempts: 'dontInvert' });
+            return code ? code.data : null;
+        }
+
+        // ── Display result ──
         function showResult(product) {
             const resultCard = document.getElementById('result-card');
             const badgeCont = document.getElementById('badge-container');
             const processDiv = document.getElementById('process-details');
             const actionDiv = document.getElementById('action-section');
-            
+
             resultCard.classList.remove('hidden');
             processDiv.innerHTML = '';
             actionDiv.innerHTML = '';
-            
+
             document.getElementById('product-name').innerText = product.name;
             document.getElementById('product-origin').innerText = "Source: " + product.origin;
+            document.getElementById('product-id').innerText = "QR ID: " + product.giId;
 
             if (product.isVerified) {
-                badgeCont.innerHTML = `<span class="badge badge-success">✓ ORIGIN VERIFIED</span>`;
-                processDiv.innerHTML = `
-                    <div style="margin-top: 10px; font-size: 0.8rem; background: #f0f7f2; padding: 10px; border-radius: 8px;">
-                        <b>Verified Standards:</b>
-                        <ul style="margin: 5px 0; padding-left: 15px;">
-                            <b>Sourcing:</b> ${product.process.sourcing}<br>
-                            <hr style="border: 0; border-top: 1px solid #eee; margin: 8px 0;">
-                            <b>Nursery:</b> ${product.process.nursery}<br>
-                            <hr style="border: 0; border-top: 1px solid #eee; margin: 8px 0;">
-                            <b>Harvest:</b> ${product.process.harvest}<br>
-                            <hr style="border: 0; border-top: 1px solid #eee; margin: 8px 0;">
-                            <b>Storage:</b> ${product.process.storage}
-                        </ul>
-                    </div>`;
+                badgeCont.innerHTML = '<span class="badge badge-success">&#10003; ORIGIN VERIFIED</span>';
+                processDiv.innerHTML =
+                    '<div style="margin-top: 10px; font-size: 0.8rem; background: #f0f7f2; padding: 10px; border-radius: 8px;">' +
+                        '<b>Verified Standards:</b>' +
+                        '<ul style="margin: 5px 0; padding-left: 15px;">' +
+                            '<b>Sourcing:</b> ' + product.process.sourcing + '<br>' +
+                            '<hr style="border: 0; border-top: 1px solid #eee; margin: 8px 0;">' +
+                            '<b>Nursery:</b> ' + product.process.nursery + '<br>' +
+                            '<hr style="border: 0; border-top: 1px solid #eee; margin: 8px 0;">' +
+                            '<b>Harvest:</b> ' + product.process.harvest + '<br>' +
+                            '<hr style="border: 0; border-top: 1px solid #eee; margin: 8px 0;">' +
+                            '<b>Storage:</b> ' + product.process.storage +
+                        '</ul>' +
+                    '</div>';
                 document.getElementById('map-section').style.display = 'block';
             } else {
-                badgeCont.innerHTML = `<span class="badge badge-fail">⚠️ AUTHENTICATION FAILED</span>`;
-                processDiv.innerHTML = `
-                    <div style="margin-top: 10px; font-size: 0.8rem; background: #fff1f0; padding: 10px; border-radius: 8px; border: 1px solid #ffa39e;">
-                        <b>Rejection Reason:</b> ${product.process.reason}
-                    </div>`;
-                actionDiv.innerHTML = `<button class="report-btn">Report Counterfeit to BAFRA</button>`;
+                badgeCont.innerHTML = '<span class="badge badge-fail">&#9888; AUTHENTICATION FAILED</span>';
+                processDiv.innerHTML =
+                    '<div style="margin-top: 10px; font-size: 0.8rem; background: #fff1f0; padding: 10px; border-radius: 8px; border: 1px solid #ffa39e;">' +
+                        '<b>Rejection Reason:</b> ' + product.process.reason +
+                    '</div>';
+                actionDiv.innerHTML = '<button class="report-btn">Report Counterfeit to BAFRA</button>';
                 document.getElementById('map-section').style.display = 'none';
             }
 
@@ -170,11 +304,12 @@
                 } else {
                     map.setView([product.lat, product.lng], 12);
                 }
-                setTimeout(() => { map.invalidateSize(); }, 200);
+                setTimeout(function() { map.invalidateSize(); }, 200);
                 if (marker) map.removeLayer(marker);
                 marker = L.marker([product.lat, product.lng]).addTo(map).bindPopup(product.name).openPopup();
             }
         }
+
     </script>
 </body>
 </html>
