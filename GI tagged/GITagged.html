@@ -42,6 +42,15 @@
         <h2>GI Product Authenticator</h2>
         <p style="font-size: 0.9rem;">Scan a QR code to verify product authenticity</p>
 
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px;">
+          <label style="font-size: 0.85rem; font-weight: 600; color: #555;">Voice Assistance</label>
+          <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
+            <input type="checkbox" id="talkback-toggle" checked style="opacity: 0; width: 0; height: 0;">
+            <span style="position: absolute; inset: 0; background: #ccc; border-radius: 24px; transition: 0.3s;"></span>
+            <span id="talkback-knob" style="position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: #fff; border-radius: 50%; transition: 0.3s;"></span>
+          </label>
+        </div>
+
         <div class="mode-toggle">
             <button id="mode-camera" class="active" onclick="setMode('camera')">Camera Scan</button>
             <button id="mode-upload" onclick="setMode('upload')">Upload QR Image</button>
@@ -309,6 +318,50 @@
                 marker = L.marker([product.lat, product.lng]).addTo(map).bindPopup(product.name).openPopup();
             }
         }
+
+        // ── Talkback / Voice Assistance ──
+        const talkbackToggle = document.getElementById('talkback-toggle');
+        const talkbackKnob = document.getElementById('talkback-knob');
+
+        talkbackToggle.addEventListener('change', () => {
+          const on = talkbackToggle.checked;
+          talkbackKnob.style.left = on ? '22px' : '2px';
+          talkbackToggle.previousElementSibling.style.background = on ? '#1a73e8' : '#ccc';
+          if (on) speak('Voice assistance enabled');
+        });
+        // Set initial style
+        talkbackKnob.style.left = '22px';
+        talkbackToggle.previousElementSibling.style.background = '#1a73e8';
+
+        function speak(text) {
+          if (!talkbackToggle.checked) return;
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.rate = 0.95;
+          utterance.pitch = 1;
+          utterance.lang = 'en-US';
+          window.speechSynthesis.speak(utterance);
+        }
+
+        // Observe status changes to speak them
+        const statusEl = document.getElementById('scan-status');
+        const statusObserver = new MutationObserver(() => {
+          const text = statusEl.textContent.trim();
+          if (text) speak(text);
+        });
+        statusObserver.observe(statusEl, { childList: true, characterData: true, subtree: true });
+
+        // Speak result when shown
+        const resultObserver = new MutationObserver(() => {
+          const resultCard = document.getElementById('result-card');
+          if (!resultCard.classList.contains('hidden')) {
+            const name = document.getElementById('product-name').textContent;
+            const origin = document.getElementById('product-origin').textContent;
+            const badge = document.getElementById('badge-container').textContent.trim();
+            speak(badge + '. ' + name + '. ' + origin);
+          }
+        });
+        resultObserver.observe(document.getElementById('result-card'), { attributes: true, attributeFilter: ['class'] });
 
     </script>
 </body>
