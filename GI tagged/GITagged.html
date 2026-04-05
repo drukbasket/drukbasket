@@ -136,6 +136,7 @@
             document.getElementById('scan-btn').innerText = 'Scan QR Code';
             document.getElementById('scan-status').textContent = '';
             document.getElementById('result-card').classList.add('hidden');
+            speak('Switched to ' + (mode === 'camera' ? 'camera scan' : 'upload') + ' mode');
         }
 
         function handleScannerClick() {
@@ -161,8 +162,10 @@
                 document.getElementById('scan-btn').disabled = false;
                 document.getElementById('scan-btn').innerText = 'Scan QR Code';
                 document.getElementById('scan-status').textContent = 'Camera ready. Point at a QR code and tap Scan.';
+                speak('Camera ready. Point at a QR code and tap Scan.');
             } catch (err) {
                 document.getElementById('scan-status').innerHTML = '<span class="status-error">Camera access denied. Switch to Upload mode.</span>';
+                speak('Camera access denied. Please switch to upload mode.');
             }
         }
 
@@ -206,6 +209,7 @@
             btn.innerText = "Scanning for QR Code...";
             scanner.classList.add('scanning');
             status.textContent = 'Analyzing image for QR codes...';
+            speak('Scanning for QR code. Please wait.');
 
             setTimeout(() => {
                 let qrData = null;
@@ -222,13 +226,16 @@
                     const product = giDatabase[qrData];
                     if (product) {
                         status.innerHTML = '<span class="status-success">QR decoded: ' + qrData + '</span>';
+                        speak('QR code decoded successfully. ' + qrData);
                         showResult(product);
                     } else {
                         status.innerHTML = '<span class="status-error">QR code "' + qrData + '" not found in GI registry.</span>';
+                        speak('QR code not found in the GI registry.');
                         document.getElementById('result-card').classList.add('hidden');
                     }
                 } else {
                     status.innerHTML = '<span class="status-error">No QR code detected. Try a clearer image.</span>';
+                    speak('No QR code detected. Please try a clearer image.');
                     document.getElementById('result-card').classList.add('hidden');
                 }
 
@@ -282,6 +289,7 @@
 
             if (product.isVerified) {
                 badgeCont.innerHTML = '<span class="badge badge-success">&#10003; ORIGIN VERIFIED</span>';
+                setTimeout(() => speak('Origin verified. ' + product.name + '. Source: ' + product.origin), 1500);
                 processDiv.innerHTML =
                     '<div style="margin-top: 10px; font-size: 0.8rem; background: #f0f7f2; padding: 10px; border-radius: 8px;">' +
                         '<b>Verified Standards:</b>' +
@@ -298,6 +306,7 @@
                 document.getElementById('map-section').style.display = 'block';
             } else {
                 badgeCont.innerHTML = '<span class="badge badge-fail">&#9888; AUTHENTICATION FAILED</span>';
+                setTimeout(() => speak('Warning. Authentication failed. ' + product.name + '. ' + product.process.reason), 1500);
                 processDiv.innerHTML =
                     '<div style="margin-top: 10px; font-size: 0.8rem; background: #fff1f0; padding: 10px; border-radius: 8px; border: 1px solid #ffa39e;">' +
                         '<b>Rejection Reason:</b> ' + product.process.reason +
@@ -335,33 +344,15 @@
 
         function speak(text) {
           if (!talkbackToggle.checked) return;
+          if (!window.speechSynthesis) return;
           window.speechSynthesis.cancel();
           const utterance = new SpeechSynthesisUtterance(text);
-          utterance.rate = 0.95;
+          utterance.rate = 0.9;
           utterance.pitch = 1;
           utterance.lang = 'en-US';
-          window.speechSynthesis.speak(utterance);
+          // Some browsers need a small delay after cancel
+          setTimeout(() => { window.speechSynthesis.speak(utterance); }, 50);
         }
-
-        // Observe status changes to speak them
-        const statusEl = document.getElementById('scan-status');
-        const statusObserver = new MutationObserver(() => {
-          const text = statusEl.textContent.trim();
-          if (text) speak(text);
-        });
-        statusObserver.observe(statusEl, { childList: true, characterData: true, subtree: true });
-
-        // Speak result when shown
-        const resultObserver = new MutationObserver(() => {
-          const resultCard = document.getElementById('result-card');
-          if (!resultCard.classList.contains('hidden')) {
-            const name = document.getElementById('product-name').textContent;
-            const origin = document.getElementById('product-origin').textContent;
-            const badge = document.getElementById('badge-container').textContent.trim();
-            speak(badge + '. ' + name + '. ' + origin);
-          }
-        });
-        resultObserver.observe(document.getElementById('result-card'), { attributes: true, attributeFilter: ['class'] });
 
     </script>
 </body>
